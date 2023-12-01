@@ -15,7 +15,6 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.model_selection import train_test_split
 
 
-
 data = pd.read_csv('ClaMP_Raw-5184.csv', skipinitialspace=True)
 
 data.head()
@@ -23,21 +22,21 @@ data.head()
 
 cl = data['benign'].value_counts()
 cl2 = len(data['benign'])
-#class is classifying malicious and benign
+# class is classifying malicious and benign
 
 
 feature_col = ["e_lfanew", "NumberOfSections", "Characteristics", "SizeOfCode", "AddressOfEntryPoint", "SizeOfImage"]
 X = data[feature_col]
 y = data.benign
 
-#print(X.shape)
-#print(y.shape)
-#print(X.describe())
-#print(y.describe())
+# print(X.shape)
+# print(y.shape)
+# print(X.describe())
+# print(y.describe())
 
 #
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 1)
-#print(X.shape())
+# print(X.shape())
 
 
 
@@ -46,10 +45,10 @@ X_test = normalize(X_test, norm = 'l1')
 
 
 
-#print(y_test.value_counts())
+# print(y_test.value_counts())
 
 
-#column creations for ML to read from (PANDAS)
+# column creations for ML to read from (PANDAS)
 column_names = ["e_lfanew", "NumberOfSections", "Characteristics", "SizeOfCode", "AddressOfEntryPoint", "SizeOfImage"
                 ]
 
@@ -103,8 +102,6 @@ class Environment1:
 env = Environment1(X_train, y_train)
 
 
-
-
 # return Q, total_losses, total_rewards
 
 # class Q-network
@@ -153,7 +150,7 @@ memory_size = 32
 batch_size = 8
 gamma = 0.97
 
-memory = []  # Replay Memory
+memory = []  # Replay memory
 total_step = 0
 total_rewards = []
 total_losses = []
@@ -170,7 +167,7 @@ accuracy_per_epoch = []
 
 
 def testing():
-    #testing: sets the environment's integration from dataset to train, execution part of training
+    # testing: sets the environment's integration from dataset to train, execution part of training
     test_env = Environment1(X_test, y_test)
     pobs = test_env.reset()
     test_acts = []
@@ -201,8 +198,9 @@ def testing():
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operating Characteristic (ROC) Curve')
     plt.legend(loc="lower right")
-    plt.show()
     plt.savefig('AUC.png')
+    plt.show()
+
 
 # accuracy between 49-50%
 
@@ -216,7 +214,7 @@ for epoch in range(epoch_num):
     total_loss = 0
     if not done and step < step_max:
 
-            # select that
+        # go through steps in training
         pact = np.random.randint(2)
         if np.random.rand() > epsilon:
             pact = Q(np.array(pobs, dtype=np.float32).reshape(1, -1))
@@ -272,51 +270,38 @@ for epoch in range(epoch_num):
             pobs = obs
             step += 1
             total_step += 1
-        #appending rewards/loss
+        # appending rewards/loss
         total_rewards.append(total_reward)
         total_losses.append(total_loss)
         if (epoch+1) % show_log_freq == 0:
             log_reward = sum(total_rewards[((epoch+1)-show_log_freq):])/show_log_freq
             log_loss = sum(total_losses[((epoch+1)-show_log_freq):])/show_log_freq
             elapsed_time = time.time()-start
-            print('\t'.join(map(str, [epoch+1, epsilon, total_step, log_reward, log_loss, elapsed_time])))
+            print('\t'.join(map(str, [epoch+1, epsilon, total_step, log_loss, elapsed_time])))
+            # epsilon: agent randomly explores action space at a higher rate
+            # loss function used in logistic regression
 
-            #30	1.0	0	0.0	0.0	3.4301397800445557
-
-
-
-
-
-
-#print('AUC: %.3f' % auc)
-
-
-
+            # 30	1.0	0	0.0	0.0	3.4301397800445557
 
 
 def annot_max(x, y, ax=None):
-    xmax = x[np.argmax(y)]
-    ymax = max(y)
-    text = "x={:}, y={:.3f}".format(xmax, ymax)
+    x_max = x[np.argmax(y)]
+    y_max = max(y)
+    text = "x={:}, y={:.3f}".format(x_max, y_max)
     if not ax:
         ax = plt.gca()
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
-    arrowprops = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
+    arrow_props = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
     kw = dict(xycoords='data', textcoords="axes fraction",
-              arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top")
-    ax.annotate(text, xy=(xmax, ymax), xytext=(0.94, 0.96), **kw)
-
-
-
-
+              arrowprops=arrow_props, bbox=bbox_props, ha="right", va="top")
+    ax.annotate(text, xy=(x_max, y_max), xytext=(0.94, 0.96), **kw)
 
 
 def main():
 
     testing()
-    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-         31]
-    y = accuracy_per_epoch * 31
+    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    y = accuracy_per_epoch * 30
 
     plt.plot(x, y, color='green', linewidth=3)
     plt.xlim(1, 31)
@@ -325,9 +310,6 @@ def main():
     plt.grid(True)
     annot_max(x, y)
     plt.savefig('accuracy_graph.png')
-
-
-
 
 
 if __name__ == '__main__':

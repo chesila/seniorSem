@@ -77,22 +77,25 @@ def plot_classification_error(neighbors_list, MSE_list):
     plt.ylabel('Accuracy')
     plt.show()
 
-
+import matplotlib.pyplot as plt2
 # plot AUC curve
+
+
 def plot_roc_curve(y_test, prediction):
     fpr, tpr, threshold = roc_curve(y_test, prediction)
     roc_auc = auc(fpr, tpr)
 
-    plt.title('Receiver Operating Characteristics')
-    plt.plot(fpr, tpr, 'b', label='AUC = %0.2f' % roc_auc)
-    plt.legend(loc='lower right')
-    plt.plot([0, 1], [0, 1], 'r--')
-    plt.xlim([0, 1])
-    plt.ylim([0, 1])
-    plt.ylabel('TPR')
-    plt.xlabel('FPR')
-    plt.show()
-    plt.savefig('AUC')
+    plt2.title('Receiver Operating Characteristics')
+    plt2.plot(fpr, tpr, 'b', label='AUC = %0.2f' % roc_auc)
+    plt2.legend(loc='lower right')
+    plt2.plot([0, 1], [0, 1], 'r--')
+    plt2.xlim([0, 1])
+    plt2.ylim([0, 1])
+    plt2.ylabel('TPR')
+    plt2.xlabel('FPR')
+    plt2.savefig('AUC_KNN.png')
+    plt2.show()
+
 
 
 # main call
